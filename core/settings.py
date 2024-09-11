@@ -56,7 +56,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'core.urls'
 
 CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:5500/index.html',
+    'http://127.0.0.1:5500',
 ]
 
 TEMPLATES = [
