@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from django.http import Http404
 
 from .serializers import TodoSerializer
 from .models import Todo
@@ -41,11 +42,9 @@ class TodoListCreateAPIView(APIView):
 
         serializer = TodoSerializer(data=data)
 
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TodoDetailAPIView(APIView):
@@ -54,9 +53,7 @@ class TodoDetailAPIView(APIView):
         try:
             obj = Todo.objects.get(pk=pk)
         except Todo.DoesNotExist:
-            raise ValidationError(
-                {"error": "Provided Todo Id does not exists."}
-            )
+            raise Http404()
 
         return obj
 
@@ -70,10 +67,10 @@ class TodoDetailAPIView(APIView):
     def put(self, request, pk):
 
         todo = self.get_object(pk=pk)
-        data = validate_data(data=request.data)
-        serializer = TodoSerializer(todo, data=data)
+        # data = validate_data(data=request.data)
+        serializer = TodoSerializer(todo, data=request.data)
 
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 
